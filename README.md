@@ -6,13 +6,13 @@ most resumes fail to show real ability. provia focuses on practical proof throug
 
 this project is being built as an mvp and is still in progress.
 
-## why provia
+### why provia exists
 
-- resumes are based on claims, not proof  
-- beginners struggle to show real skills  
-- recruiters can’t easily verify what a candidate actually knows  
+resumes list skills.
+provia asks you to prove them.
 
-provia tries to fix this by shifting focus from “i know this” to “here is what i built / solved”.
+instead of claiming proficiency, users submit real work.
+each skill lives as proof, not a bullet point.
 
 ## what provia does (current idea)
 
