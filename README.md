@@ -17,7 +17,7 @@ Unlike a standard portfolio, Provia implements a logic-based system to validate 
 - **State Management:** React Hooks (useState/useEffect)
 - **Deployment:** Vercel CI/CD
 - **Version Control:** Git/GitHub
-
+  
 ##  Roadmap
 - [ ] Firebase Integration for persistent data storage
 - [ ] Real-time GitHub API integration for repo scanning
