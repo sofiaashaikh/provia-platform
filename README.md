@@ -1,16 +1,60 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# provia
 
-Currently, two official plugins are available:
+provia is a skill-based platform where students can prove what they actually know, instead of just listing skills on a resume.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+most resumes fail to show real ability. provia focuses on practical proof through small challenges, tasks, and validations that reflect actual skills.
 
-## React Compiler
+this project is being built as an mvp and is still in progress.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### why provia exists
 
-## Expanding the ESLint configuration
+resumes list skills.
+provia asks you to prove them.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+instead of claiming proficiency, users submit real work.
+each skill lives as proof, not a bullet point.
+
+## what provia does (current idea)
+
+- users can select skills they want to prove  
+- each skill has small, practical challenges  
+- completed challenges act as skill proof  
+- skill progress is visible instead of just certificates  
+
+this is meant mainly for students, freshers, and early-stage developers.
+
+## current stage
+
+- planning and product definition  
+- setting up frontend and backend structure  
+- working towards a basic usable mvp  
+
+## planned features (mvp)
+
+- user authentication  
+- skill cards (html/css, javascript, etc.)  
+- simple challenges per skill  
+- basic progress tracking  
+
+## tech stack (planned)
+
+- frontend: react  
+- backend: firebase  
+- auth: firebase authentication  
+- database: firestore  
+
+this may evolve as the project grows.
+
+## future scope
+
+- peer or mentor validation  
+- recruiter-facing skill profiles  
+- company-specific challenges  
+- public shareable skill pages  
+
+---
+
+status: mvp in progress  
+built as a personal project to learn and explore real-world product development.
+
