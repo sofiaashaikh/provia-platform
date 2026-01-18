@@ -1,60 +1,25 @@
+# provia 
+### Resumes list skills. Provia asks you to prove them.
 
-# provia
+Provia is a proof-based skill verification platform built to help students and freshers turn "claims" into "proof." Instead of bullet points, users submit real work that is vetted by a systematic verification engine.
 
-provia is a skill-based platform where students can prove what they actually know, instead of just listing skills on a resume.
+##  Live Demo
+[https://provia-app.vercel.app](https://provia-app.vercel.app)
 
-most resumes fail to show real ability. provia focuses on practical proof through small challenges, tasks, and validations that reflect actual skills.
+##  The Verification Engine
+Unlike a standard portfolio, Provia implements a logic-based system to validate skills:
+- **Automated Check**: Scans for GitHub repository signals and deployment markers (Vercel/Netlify).
+- **Ownership Analysis**: Requires user-documented decision-making to prevent copy-pasting.
+- **Status Pills**: Clear visual indicators for "Pending" vs "Verified" credentials.
 
-this project is being built as an mvp and is still in progress.
+##  Tech Stack
+- **Frontend:** React (Vite)
+- **State Management:** React Hooks (useState/useEffect)
+- **Deployment:** Vercel CI/CD
+- **Version Control:** Git/GitHub
 
-### why provia exists
-
-resumes list skills.
-provia asks you to prove them.
-
-instead of claiming proficiency, users submit real work.
-each skill lives as proof, not a bullet point.
-
-## what provia does (current idea)
-
-- users can select skills they want to prove  
-- each skill has small, practical challenges  
-- completed challenges act as skill proof  
-- skill progress is visible instead of just certificates  
-
-this is meant mainly for students, freshers, and early-stage developers.
-
-## current stage
-
-- planning and product definition  
-- setting up frontend and backend structure  
-- working towards a basic usable mvp  
-
-## planned features (mvp)
-
-- user authentication  
-- skill cards (html/css, javascript, etc.)  
-- simple challenges per skill  
-- basic progress tracking  
-
-## tech stack (planned)
-
-- frontend: react  
-- backend: firebase  
-- auth: firebase authentication  
-- database: firestore  
-
-this may evolve as the project grows.
-
-## future scope
-
-- peer or mentor validation  
-- recruiter-facing skill profiles  
-- company-specific challenges  
-- public shareable skill pages  
-
----
-
-status: mvp in progress  
-built as a personal project to learn and explore real-world product development.
+##  Roadmap
+- [ ] Firebase Integration for persistent data storage
+- [ ] Real-time GitHub API integration for repo scanning
+- [ ] Peer-review community layer
 
