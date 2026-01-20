@@ -22,10 +22,12 @@ function App() {
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [proofs, setProofs] = useState([]);
 
+  // 🛡️ Monitor Authentication State
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        // Only load data for the logged-in user
         const userProofsRef = ref(db, `proofs/${currentUser.uid}`);
         onValue(userProofsRef, (snapshot) => {
           const data = snapshot.val();
@@ -51,22 +53,21 @@ function App() {
   const handleProofSubmission = async (newProof) => {
     if (!user) return;
     
-    // 🛡️ ENHANCED VERIFICATION LOGIC
+    // ⚙️ Automated Verification Logic
     const checks = {
       repoExists: newProof.link.toLowerCase().includes('github.com'),
-      hasCommits: true,
       hasReadme: newProof.description.length > 20,
       hasLiveLink: newProof.link.includes('vercel.app') || newProof.link.includes('netlify.app')
     };
 
-    // If it's HTML and has a GitHub link, mark as VERIFIED
+    // Auto-verify if it's a GitHub repo for HTML
     const isVerified = newProof.skill.toLowerCase() === 'html' && checks.repoExists;
     const finalStatus = isVerified ? 'verified' : 'pending';
 
     const userProofsRef = ref(db, `proofs/${user.uid}`); 
     await push(userProofsRef, { 
       ...newProof, 
-      status: finalStatus, // This makes the green badge appear
+      status: finalStatus,
       checks,
       createdAt: serverTimestamp() 
     });
@@ -74,14 +75,25 @@ function App() {
     setCurrentScreen('dashboard');
   };
 
+  // 1. Landing & Authentication Screen
   if (!user) return (
     <div className="landing-container">
       <h1 className="provia-title">provia</h1>
       <form className="auth-form" onSubmit={handleAuth}>
-        <input type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} required />
+        <input 
+          type="email" 
+          placeholder="email address" 
+          onChange={e => setEmail(e.target.value)} 
+          required 
+        />
+        <input 
+          type="password" 
+          placeholder="password" 
+          onChange={e => setPassword(e.target.value)} 
+          required 
+        />
         <button type="submit" className="auth-btn">
-          {authMode === 'login' ? 'login' : 'sign up'}
+          {authMode === 'login' ? 'login' : 'create account'}
         </button>
       </form>
       <p className="auth-toggle" onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}>
@@ -90,16 +102,62 @@ function App() {
     </div>
   );
 
-  if (currentScreen === 'skills') return <SkillSelect onContinue={(s) => { setSelectedSkill(s); setCurrentScreen('proof'); }} />;
-  if (currentScreen === 'proof') return <ProofSubmit selectedSkill={selectedSkill} onFinalSubmit={handleProofSubmission} />;
+  // 2. Skill Selection Screen
+  if (currentScreen === 'skills') {
+    return (
+      <SkillSelect 
+        onContinue={(skill) => { 
+          setSelectedSkill(skill); 
+          setCurrentScreen('proof'); 
+        }} 
+      />
+    );
+  }
+
+  // 3. Proof Submission Screen
+  if (currentScreen === 'proof') {
+    return (
+      <ProofSubmit 
+        selectedSkill={selectedSkill} 
+        onFinalSubmit={handleProofSubmission} 
+      />
+    );
+  }
   
+  // 4. Main Dashboard Screen
   return (
     <div className="app-main">
-      <nav className="navbar">
-        <span className="user-email">{user.email}</span>
-        <button className="logout-btn" onClick={() => signOut(auth)}>logout</button>
+      <nav style={{
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '20px 0', 
+        borderBottom: '1px solid #eee',
+        marginBottom: '40px'
+      }}>
+        <span style={{fontWeight: '900', fontSize: '1.8rem', letterSpacing: '-2px'}}>provia</span>
+        <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+          <span style={{fontSize: '0.8rem', color: '#666'}}>{user.email}</span>
+          <button 
+            onClick={() => signOut(auth)} 
+            style={{
+              background: 'none', 
+              border: '1px solid #000', 
+              borderRadius: '6px',
+              padding: '5px 12px',
+              cursor: 'pointer',
+              fontSize: '0.8rem'
+            }}
+          >
+            logout
+          </button>
+        </div>
       </nav>
-      <Dashboard proofs={proofs} onAddMore={() => setCurrentScreen('skills')} />
+      
+      <Dashboard 
+        proofs={proofs} 
+        onAddMore={() => setCurrentScreen('skills')} 
+      />
     </div>
   );
 }

@@ -1,36 +1,41 @@
-// src/pages/ProofSubmit.jsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-const ProofSubmit = ({ selectedSkill, onFinalSubmit }) => {
-  const [formData, setFormData] = useState({ link: '', description: '', ownership: '' });
+function ProofSubmit({ selectedSkill, onFinalSubmit }) {
+  const [link, setLink] = useState('');
+  const [desc1, setDesc1] = useState('');
+  const [desc2, setDesc2] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onFinalSubmit({ ...formData, skill: selectedSkill });
+  const handleSubmit = () => {
+    onFinalSubmit({
+      skill: selectedSkill,
+      link: link,
+      description: desc1,
+      contribution: desc2
+    });
   };
 
   return (
-    <div className="landing-container">
-      <h2>prove your {selectedSkill} skill</h2>
-      <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '400px' }}>
+    <div className="page-container">
+      <h1>proving {selectedSkill}</h1>
+      <div className="proof-form">
         <input 
-          className="proof-input" required type="url" placeholder="project link"
-          onChange={(e) => setFormData({...formData, link: e.target.value})}
+          placeholder="github repository link" 
+          onChange={(e) => setLink(e.target.value)}
         />
         <textarea 
-          className="proof-input" required placeholder="what does this project show?"
-          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          placeholder="what does this project show?" 
+          onChange={(e) => setDesc1(e.target.value)}
         />
-        {/* STEP 2: Ownership Field */}
         <textarea 
-          className="proof-input" placeholder="what did you personally build or decide here? (optional)"
-          style={{ height: '100px' }}
-          onChange={(e) => setFormData({...formData, ownership: e.target.value})}
+          placeholder="what did you personally build?" 
+          onChange={(e) => setDesc2(e.target.value)}
         />
-        <button type="submit" className="get-started-btn" style={{ width: '100%' }}>submit proof</button>
-      </form>
+        <button className="action-btn" onClick={handleSubmit}>
+          submit for verification
+        </button>
+      </div>
     </div>
   );
-};
+}
 
 export default ProofSubmit;

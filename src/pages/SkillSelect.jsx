@@ -1,38 +1,32 @@
-// src/pages/SkillSelect.jsx
-import { useState } from 'react';
-import '../styles/landing.css';
+import React, { useState } from 'react';
 
-const SkillSelect = ({ onContinue }) => {
-  const [selectedSkill, setSelectedSkill] = useState(null);
-  const skills = ['HTML', 'CSS', 'JavaScript', 'Git'];
+function SkillSelect({ onContinue }) {
+  const [selected, setSelected] = useState('');
+  const skills = ['HTML', 'CSS', 'JavaScript', 'React', 'Git', 'Firebase'];
 
   return (
-    <div className="landing-container">
-      <h2>what’s the first skill you want to prove?</h2>
-      <p className="provia-subtitle">you can add more later. start with one.</p>
-      
+    <div className="page-container">
+      <h1>select a skill to prove</h1>
       <div className="skill-grid">
-        {skills.map((skill) => (
+        {skills.map(skill => (
           <div 
-            key={skill}
-            className={`skill-card ${selectedSkill === skill ? 'selected' : ''}`}
-            onClick={() => setSelectedSkill(skill)}
+            key={skill} 
+            className={`skill-card ${selected === skill ? 'selected' : ''}`}
+            onClick={() => setSelected(skill)}
           >
             {skill}
           </div>
         ))}
       </div>
-
       <button 
-        className="get-started-btn" 
-        disabled={!selectedSkill}
-        onClick={() => onContinue(selectedSkill)}
-        style={{ marginTop: '2rem' }}
+        className="action-btn" 
+        style={{width: '200px'}}
+        onClick={() => selected && onContinue(selected)}
       >
         continue
       </button>
     </div>
   );
-};
+}
 
 export default SkillSelect;
