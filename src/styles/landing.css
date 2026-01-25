@@ -1,94 +1,65 @@
 /* src/styles/landing.css */
 :root {
-  --bg: #030303;
-  --accent: #ffffff;
-  --glass: rgba(255, 255, 255, 0.02);
-  --glass-hover: rgba(255, 255, 255, 0.05);
-  --border: rgba(255, 255, 255, 0.08);
+  --bg: #050505;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.1);
+  --green: #4ade80;
+  --red: #f87171;
 }
 
-body {
-  margin: 0;
-  background-color: var(--bg);
-  color: var(--accent);
-  font-family: 'Inter', -apple-system, sans-serif;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-.app-container {
-  min-height: 100vh;
-  background: radial-gradient(circle at 50% -20%, #1a1a1a, #030303);
-  display: flex;
-  flex-direction: column;
-}
+body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; }
 
-.view-wrapper {
-  flex: 1;
+.app-container { min-height: 100vh; background: radial-gradient(circle at top, #111, #050505); display: flex; flex-direction: column; align-items: center; }
+
+.view-wrapper { width: 100%; max-width: 1000px; padding: 40px 20px; box-sizing: border-box; }
+
+/* 💎 ELITE NAV BAR */
+.top-nav {
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
+  padding: 20px 0;
+  margin-bottom: 40px;
 }
 
-.provia-hero {
-  font-size: clamp(4rem, 15vw, 10rem);
-  font-weight: 900;
-  letter-spacing: -0.06em;
-  margin: 0 0 2rem 0;
-  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.glass-input {
-  width: 100%;
-  background: var(--glass);
+.logout-btn-premium {
+  background: rgba(255,255,255,0.05);
   border: 1px solid var(--border);
-  padding: 18px;
-  border-radius: 12px;
-  color: white;
-  font-size: 1rem;
-  backdrop-filter: blur(20px);
-  margin-bottom: 15px;
-  outline: none;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.8rem;
   transition: 0.3s;
 }
 
-.glass-input:focus {
-  border-color: rgba(255,255,255,0.3);
-  background: var(--glass-hover);
-}
+.logout-btn-premium:hover { background: #fff; color: #000; }
 
-.elite-btn {
-  background: #ffffff;
-  color: #000000;
-  width: 100%;
-  padding: 18px;
-  border-radius: 50px;
-  font-weight: 800;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  text-transform: lowercase;
-}
-
-.elite-grid {
+/* 🛡️ THE TRUTH GRID */
+.proof-grid-elite {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
   width: 100%;
 }
 
-.glass-card {
-  background: var(--glass);
+.evidence-card-glass {
+  background: var(--card-bg);
   border: 1px solid var(--border);
-  padding: 30px;
   border-radius: 20px;
-  backdrop-filter: blur(10px);
-  transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  text-align: left;
 }
+
+.status-badge-elite { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; }
+.status-badge-elite.verified { color: var(--green); border: 1px solid var(--green); background: rgba(74, 222, 128, 0.1); }
+.status-badge-elite.pending { color: #666; border: 1px solid #333; }
+
+.sig-pass { color: var(--green); font-size: 0.75rem; margin-bottom: 5px; }
+.sig-fail { color: #444; font-size: 0.75rem; margin-bottom: 5px; }
+
+/* AUTH INPUTS */
+.pass-wrapper { position: relative; width: 100%; }
+.eye-icon { position: absolute; right: 15px; top: 18px; cursor: pointer; opacity: 0.5; }
