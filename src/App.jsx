@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { ref, push, onValue, serverTimestamp } from 'firebase/database';
-import { motion, AnimatePresence } from 'framer-motion'; 
+import { motion, AnimatePresence } from 'framer-motion';
 import SkillSelect from './pages/SkillSelect';
 import ProofSubmit from './pages/ProofSubmit';
 import Dashboard from './pages/Dashboard';
@@ -18,13 +18,12 @@ function App() {
   const [proofs, setProofs] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userProofsRef = ref(db, `proofs/${currentUser.uid}`);
-        onValue(userProofsRef, (snapshot) => {
-          const data = snapshot.val();
-          setProofs(data ? Object.keys(data).map(k => ({...data[k], id: k})).reverse() : []);
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        onValue(ref(db, `proofs/${u.uid}`), (s) => {
+          const d = s.val();
+          setProofs(d ? Object.keys(d).map(k => ({...d[k], id: k})).reverse() : []);
         });
       }
     });
@@ -39,53 +38,41 @@ function App() {
     } catch (err) { alert(err.message); }
   };
 
-  if (!user) return (
-    <div className="landing-container">
-      <motion.h1 
-        className="provia-title"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      >
-        provia
-      </motion.h1>
-      
-      <motion.form 
-        className="auth-form"
-        initial={{ opacity: 0, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, filter: 'blur(0px)' }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-        onSubmit={handleAuth}
-      >
-        <input type="email" placeholder="email address" onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="password" onChange={e => setPassword(e.target.value)} required />
-        <button type="submit" className="auth-btn">
-          {authMode === 'login' ? 'enter workspace' : 'create account'}
-        </button>
-      </motion.form>
-      
-      <motion.p 
-        className="auth-toggle"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
-        whileHover={{ opacity: 1 }}
-        onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-      >
-        {authMode === 'login' ? "request access / sign up" : "already a member? login"}
-      </motion.p>
-    </div>
-  );
+  const submitProof = async (data) => {
+    const isVerified = data.skill.toLowerCase() === 'html' && data.link.includes('github.com');
+    await push(ref(db, `proofs/${user.uid}`), { ...data, status: isVerified ? 'verified' : 'pending', createdAt: serverTimestamp() });
+    setCurrentScreen('dashboard');
+  };
 
   return (
-    <div className="app-main">
-      {/* Your dashboard logic stays the same but now inherits the dark theme */}
-      {currentScreen === 'skills' && <SkillSelect onContinue={(s) => { setSelectedSkill(s); setCurrentScreen('proof'); }} />}
-      {currentScreen === 'proof' && <ProofSubmit selectedSkill={selectedSkill} onFinalSubmit={() => setCurrentScreen('dashboard')} />}
-      {currentScreen === 'dashboard' && (
-        <Dashboard proofs={proofs} onAddMore={() => setCurrentScreen('skills')} />
-      )}
+    <div className="app-container">
+      <AnimatePresence mode="wait">
+        {!user ? (
+          <motion.div key="auth" className="view-wrapper" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
+            <h1 className="provia-hero">provia</h1>
+            <form style={{width: '320px'}} onSubmit={handleAuth}>
+              <input className="glass-input" type="email" placeholder="email" onChange={e => setEmail(e.target.value)} />
+              <input className="glass-input" type="password" placeholder="password" onChange={e => setPassword(e.target.value)} />
+              <button className="elite-btn">{authMode}</button>
+            </form>
+            <p onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')} style={{marginTop: '20px', cursor: 'pointer', opacity: 0.5}}>
+              {authMode === 'login' ? 'new? create account' : 'already a member? login'}
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div key="app" className="view-wrapper" initial={{opacity:0}} animate={{opacity:1}}>
+            <nav style={{width: '100%', display: 'flex', justifyContent: 'space-between', marginBottom: '50px'}}>
+              <span style={{fontWeight: 900, fontSize: '1.5rem'}}>provia</span>
+              <button onClick={() => signOut(auth)} style={{background: 'none', border: '1px solid white', color: 'white', borderRadius: '20px', padding: '5px 15px', cursor: 'pointer'}}>logout</button>
+            </nav>
+
+            {currentScreen === 'dashboard' && <Dashboard proofs={proofs} onAdd={() => setCurrentScreen('skills')} />}
+            {currentScreen === 'skills' && <SkillSelect onSelect={(s) => { setSelectedSkill(s); setCurrentScreen('submit'); }} />}
+            {currentScreen === 'submit' && <ProofSubmit skill={selectedSkill} onSubmit={submitProof} />}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
 export default App;

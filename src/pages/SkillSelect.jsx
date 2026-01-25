@@ -1,32 +1,22 @@
-import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
-function SkillSelect({ onContinue }) {
-  const [selected, setSelected] = useState('');
+export default function SkillSelect({ onSelect }) {
   const skills = ['HTML', 'CSS', 'JavaScript', 'React', 'Git', 'Firebase'];
-
   return (
-    <div className="page-container">
-      <h1>select a skill to prove</h1>
-      <div className="skill-grid">
-        {skills.map(skill => (
-          <div 
-            key={skill} 
-            className={`skill-card ${selected === skill ? 'selected' : ''}`}
-            onClick={() => setSelected(skill)}
+    <div style={{textAlign: 'center'}}>
+      <h2 style={{fontSize: '3rem', marginBottom: '40px'}}>select expertise</h2>
+      <div className="elite-grid" style={{maxWidth: '600px'}}>
+        {skills.map((s, i) => (
+          <motion.div 
+            key={s} className="glass-card" 
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
+            onClick={() => onSelect(s)}
+            style={{cursor: 'pointer', textAlign: 'center'}}
           >
-            {skill}
-          </div>
+            {s}
+          </motion.div>
         ))}
       </div>
-      <button 
-        className="action-btn" 
-        style={{width: '200px'}}
-        onClick={() => selected && onContinue(selected)}
-      >
-        continue
-      </button>
     </div>
   );
 }
-
-export default SkillSelect;

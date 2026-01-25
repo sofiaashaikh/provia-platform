@@ -1,41 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-function ProofSubmit({ selectedSkill, onFinalSubmit }) {
-  const [link, setLink] = useState('');
-  const [desc1, setDesc1] = useState('');
-  const [desc2, setDesc2] = useState('');
-
-  const handleSubmit = () => {
-    onFinalSubmit({
-      skill: selectedSkill,
-      link: link,
-      description: desc1,
-      contribution: desc2
-    });
-  };
-
+export default function ProofSubmit({ skill, onSubmit }) {
+  const [form, setForm] = useState({ link: '', description: '', contribution: '' });
   return (
-    <div className="page-container">
-      <h1>proving {selectedSkill}</h1>
-      <div className="proof-form">
-        <input 
-          placeholder="github repository link" 
-          onChange={(e) => setLink(e.target.value)}
-        />
-        <textarea 
-          placeholder="what does this project show?" 
-          onChange={(e) => setDesc1(e.target.value)}
-        />
-        <textarea 
-          placeholder="what did you personally build?" 
-          onChange={(e) => setDesc2(e.target.value)}
-        />
-        <button className="action-btn" onClick={handleSubmit}>
-          submit for verification
-        </button>
-      </div>
+    <div style={{width: '100%', maxWidth: '500px'}}>
+      <h2 style={{fontSize: '3rem', marginBottom: '10px'}}>proving {skill}</h2>
+      <p style={{opacity: 0.5, marginBottom: '30px'}}>submit repository metadata for verification</p>
+      <input className="glass-input" placeholder="repository link" onChange={e => setForm({...form, link: e.target.value})} />
+      <textarea className="glass-input" style={{height: '100px'}} placeholder="project intent" onChange={e => setForm({...form, description: e.target.value})} />
+      <textarea className="glass-input" style={{height: '100px'}} placeholder="your role" onChange={e => setForm({...form, contribution: e.target.value})} />
+      <button className="elite-btn" onClick={() => onSubmit({ ...form, skill })}>verify expertise</button>
     </div>
   );
 }
-
-export default ProofSubmit;
