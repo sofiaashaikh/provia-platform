@@ -1,19 +1,22 @@
 import { motion } from 'framer-motion';
 
 export default function SkillSelect({ onSelect }) {
-  const skills = ['HTML', 'CSS', 'JavaScript', 'React', 'Firebase', 'Git'];
+  // Added 'Python' to the list
+  const skills = ['HTML', 'CSS', 'JavaScript', 'React', 'Python', 'Firebase', 'Git'];
+  
   return (
-    <div style={{textAlign: 'center', width: '100%'}}>
-      <h2 style={{fontSize: '3rem', fontWeight: 900, marginBottom: '40px', letterSpacing: '-2px'}}>select expertise</h2>
-      <div className="proof-grid" style={{maxWidth: '700px', margin: '0 auto'}}>
+    <div style={{textAlign:'center'}}>
+      <h2 style={{fontSize:'3rem', fontWeight:900, marginBottom:'60px'}}>select_module</h2>
+      <div className="proof-grid" style={{marginTop:0}}>
         {skills.map((s, i) => (
           <motion.div 
-            key={s} className="glass-card" 
-            whileHover={{ scale: 1.05, background: 'rgba(255,255,255,0.08)' }}
+            key={s} 
+            className="glass-card"
+            whileHover={{ scale: 1.05, borderColor: 'rgba(255,255,255,0.5)' }}
             onClick={() => onSelect(s)}
-            style={{cursor: 'pointer', textAlign: 'center', padding: '40px'}}
+            style={{cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', minHeight:'150px'}}
           >
-            <span style={{fontWeight: 900, fontSize: '1.2rem'}}>{s}</span>
+            <span style={{fontWeight:900, fontSize:'1.5rem'}}>{s}</span>
           </motion.div>
         ))}
       </div>
