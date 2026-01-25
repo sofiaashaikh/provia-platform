@@ -1,95 +1,80 @@
 /* src/styles/landing.css */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #ffffff;
-  color: #000000;
+:root {
+  --bg: #0a0a0a;
+  --accent: #ffffff;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-/* Auth & Landing */
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--accent);
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The Animated Background Effect */
 .landing-container {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  background: radial-gradient(circle at 50% -20%, #1a1a1a, #0a0a0a);
+  overflow: hidden;
 }
 
 .provia-title {
-  font-size: 5rem;
+  font-size: clamp(4rem, 12vw, 10rem);
   font-weight: 900;
-  margin-bottom: 2.5rem;
-  letter-spacing: -4px;
+  letter-spacing: -0.06em;
+  margin-bottom: 2rem;
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* Glassmorphism Inputs */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 12px;
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
+  z-index: 10;
 }
 
-.auth-form input, .proof-form input, .proof-form textarea {
-  padding: 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  background-color: #f9fafb;
-  outline: none;
-  font-family: inherit;
+.auth-form input {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  padding: 16px;
+  border-radius: 14px;
+  color: white;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.auth-btn, .action-btn {
-  background-color: #000000;
-  color: #ffffff;
-  padding: 14px;
+.auth-form input:focus {
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06);
+}
+
+.auth-btn {
+  background: white;
+  color: black;
+  padding: 16px;
   border: none;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  text-transform: lowercase;
+  margin-top: 10px;
+  transition: transform 0.2s ease;
 }
 
-/* Skill Selection Page */
-.page-container {
-  max-width: 600px;
-  margin: 80px auto;
-  padding: 20px;
-  text-align: center;
-}
-
-.skill-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin: 40px 0;
-}
-
-.skill-card {
-  padding: 20px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-  font-weight: 500;
-}
-
-.skill-card.selected {
-  background-color: #000000;
-  color: #ffffff;
-  border-color: #000000;
-}
-
-/* Proof Submission Form */
-.proof-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  text-align: left;
-}
-
-.proof-form textarea {
-  min-height: 100px;
-  resize: none;
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255,255,255,0.1);
 }
