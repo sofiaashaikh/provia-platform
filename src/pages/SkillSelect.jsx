@@ -1,23 +1,25 @@
-import { motion } from 'framer-motion';
+import { Box, Terminal, Cpu, Globe, Layers, FileCode } from 'lucide-react';
 
 export default function SkillSelect({ onSelect }) {
-  // Added 'Python' to the list
-  const skills = ['HTML', 'CSS', 'JavaScript', 'React', 'Python', 'Firebase', 'Git'];
-  
+  const skills = [
+    { name: 'React', type: 'Library', icon: <Box size={24} /> },
+    { name: 'Python', type: 'Backend', icon: <Terminal size={24} /> },
+    { name: 'Machine Learning', type: 'AI/ML', icon: <Cpu size={24} /> },
+    { name: 'HTML', type: 'Structure', icon: <Globe size={24} /> },
+    { name: 'CSS', type: 'Design', icon: <Layers size={24} /> },
+    { name: 'JavaScript', type: 'Logic', icon: <FileCode size={24} /> }
+  ];
+
   return (
-    <div style={{textAlign:'center'}}>
-      <h2 style={{fontSize:'3rem', fontWeight:900, marginBottom:'60px'}}>select_module</h2>
-      <div className="proof-grid" style={{marginTop:0}}>
-        {skills.map((s, i) => (
-          <motion.div 
-            key={s} 
-            className="glass-card"
-            whileHover={{ scale: 1.05, borderColor: 'rgba(255,255,255,0.5)' }}
-            onClick={() => onSelect(s)}
-            style={{cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', minHeight:'150px'}}
-          >
-            <span style={{fontWeight:900, fontSize:'1.5rem'}}>{s}</span>
-          </motion.div>
+    <div>
+      <h2 style={{textAlign:'center', fontWeight:900, fontSize:28, marginBottom:30}}>Select Module</h2>
+      <div className="skill-grid">
+        {skills.map(s => (
+          <div key={s.name} className="skill-box" onClick={() => onSelect(s.name)}>
+            {s.icon}
+            <span>{s.name}</span>
+            <i>{s.type}</i>
+          </div>
         ))}
       </div>
     </div>

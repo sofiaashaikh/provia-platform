@@ -1,117 +1,111 @@
 import { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { ref, push, onValue, serverTimestamp } from 'firebase/database';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff } from 'lucide-react';
+import { ref, push, onValue, update, serverTimestamp, get, query, orderByChild, equalTo } from 'firebase/database';
+import Dashboard from './pages/Dashboard';
 import SkillSelect from './pages/SkillSelect';
 import ProofSubmit from './pages/ProofSubmit';
-import Dashboard from './pages/Dashboard';
 import './styles/landing.css';
 
-function App() {
+export default function App() {
   const [user, setUser] = useState(null);
+  const [screen, setScreen] = useState('dashboard');
+  const [selectedSkill, setSelectedSkill] = useState('Project');
+  const [proofs, setProofs] = useState([]);
+  const [publicProfile, setPublicProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [authMode, setAuthMode] = useState('login');
-  const [showPass, setShowPass] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [screen, setScreen] = useState('dashboard');
-  const [selectedSkill, setSelectedSkill] = useState(null);
-  const [proofs, setProofs] = useState([]);
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
 
-  // 🔥 FIREBASE REALTIME LISTENER
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      if (u) {
-        onValue(ref(db, `proofs/${u.uid}`), (snapshot) => {
-          const data = snapshot.val();
-          setProofs(data ? Object.keys(data).map(k => ({...data[k], id: k})).reverse() : []);
-        });
-      }
-    });
-    return () => unsubscribe();
+    const params = new URLSearchParams(window.location.search);
+    const u = params.get('u');
+    if (u) {
+      const q = query(ref(db, 'users'), orderByChild('username'), equalTo(u.toLowerCase().trim()));
+      get(q).then((snap) => {
+        if (snap.exists()) {
+          const uid = Object.keys(snap.val())[0];
+          setPublicProfile({ uid, ...Object.values(snap.val())[0] });
+          onValue(ref(db, `proofs/${uid}`), (s) => {
+            const d = s.val();
+            setProofs(d ? Object.keys(d).map(k => ({...d[k], id: k})).reverse() : []);
+          });
+        }
+        setLoading(false);
+      });
+    } else {
+      const unsub = onAuthStateChanged(auth, (u) => {
+        if (u) {
+          onValue(ref(db, `users/${u.uid}`), (s) => setUser({ uid: u.uid, ...s.val() }));
+          onValue(ref(db, `proofs/${u.uid}`), (s) => {
+            const d = s.val();
+            setProofs(d ? Object.keys(d).map(k => ({...d[k], id: k})).reverse() : []);
+          });
+        } else { setUser(null); }
+        setLoading(false);
+      });
+      return () => unsub();
+    }
   }, []);
 
-  const handleDeepAudit = async (data) => {
-    // 🛡️ THE TRUTH ENGINE (Verification Logic)
-    const audit = {
-      isRepo: data.link.toLowerCase().includes('github.com'),
-      isDetailed: data.description.length > 20, // Must explain the project
-      isLive: data.link.includes('vercel.app') || data.link.includes('netlify.app')
-    };
-
-    // STRICT RULE: Must be a Repo AND have Documentation to be Verified
-    const status = (audit.isRepo && audit.isDetailed) ? 'verified' : 'pending';
-
-    await push(ref(db, `proofs/${user.uid}`), {
-      ...data,
-      status: status,
-      signals: audit,
-      timestamp: serverTimestamp()
-    });
-    setScreen('dashboard');
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    try {
+      if (authMode === 'signup') {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        await update(ref(db, `users/${res.user.uid}`), { displayName: fullName, username: username.toLowerCase().trim(), email: email });
+      } else { await signInWithEmailAndPassword(auth, email, password); }
+    } catch (err) { alert(err.message); }
   };
 
-  // 3D-STYLE PAGE TRANSITIONS
-  const pageVariants = {
-    initial: { opacity: 0, y: 20, filter: 'blur(10px)' },
-    in: { opacity: 1, y: 0, filter: 'blur(0px)' },
-    out: { opacity: 0, y: -20, filter: 'blur(10px)' }
-  };
+  if (loading) return <div style={{background:'black', height:'100vh'}} />;
 
-  const pageTransition = { duration: 0.6, ease: [0.22, 1, 0.36, 1] };
-
-  // LOGIN SCREEN
-  if (!user) return (
-    <div className="app-container">
-      <motion.div className="view-wrapper" style={{maxWidth: '400px', textAlign: 'center'}} initial="initial" animate="in" variants={pageVariants} transition={pageTransition}>
-        <h1 className="provia-hero">provia</h1>
-        <form onSubmit={e => { e.preventDefault(); authMode === 'signup' ? createUserWithEmailAndPassword(auth, email, password) : signInWithEmailAndPassword(auth, email, password); }}>
-          <input className="glass-input" style={{marginBottom:'15px'}} type="email" placeholder="email" onChange={e => setEmail(e.target.value)} required />
-          <div style={{position:'relative', marginBottom:'30px'}}>
-            <input className="glass-input" type={showPass ? "text" : "password"} placeholder="password" onChange={e => setPassword(e.target.value)} required />
-            <div style={{position:'absolute', right:'15px', top:'20px', cursor:'pointer', color:'#666'}} onClick={() => setShowPass(!showPass)}>
-              {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
-            </div>
-          </div>
-          <button className="elite-btn" style={{width:'100%'}}>{authMode === 'login' ? 'enter workspace' : 'initialize account'}</button>
-        </form>
-        <p style={{marginTop:'30px', color:'#666', cursor:'pointer'}} onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}>
-          {authMode === 'login' ? 'new user? create account' : 'access existing account'}
-        </p>
-      </motion.div>
-    </div>
-  );
-
-  // APP SCREENS
   return (
     <div className="app-container">
-      <div className="view-wrapper">
-        <nav style={{display:'flex', justifyContent:'space-between', marginBottom:'60px', alignItems:'center'}}>
-          <span style={{fontWeight:900, fontSize:'1.5rem'}}>provia</span>
-          <button onClick={() => signOut(auth)} style={{background:'none', border:'1px solid #333', color:'#888', padding:'8px 20px', borderRadius:'50px', cursor:'pointer'}}>logout</button>
-        </nav>
-
-        <AnimatePresence mode="wait">
-          {screen === 'dashboard' && (
-            <motion.div key="dash" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
-              <Dashboard proofs={proofs} onAdd={() => setScreen('skills')} />
-            </motion.div>
+      {!user && !publicProfile ? (
+        <>
+          <div className="provia-title">provia</div>
+          <form onSubmit={handleAuth}>
+            <div className="input-container">
+              {authMode === 'signup' && (
+                <>
+                  <input className="glass-input" placeholder="Full Name" onChange={e => setFullName(e.target.value)} required />
+                  <input className="glass-input" placeholder="Username" onChange={e => setUsername(e.target.value)} required />
+                </>
+              )}
+              <input className="glass-input" type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} required />
+              <input className="glass-input" type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} required />
+            </div>
+            <button className="action-btn">Continue</button>
+            <p onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')} style={{textAlign:'center', fontSize:12, opacity:0.4, cursor:'pointer', marginTop:20}}>
+              {authMode === 'login' ? "Create Account" : "Back to Login"}
+            </p>
+          </form>
+        </>
+      ) : (
+        <>
+          {user && !publicProfile && (
+            <nav style={{display:'flex', justifyContent:'space-between', marginBottom:40, alignItems:'center'}}>
+              <span style={{fontWeight:900, fontSize:20}} onClick={() => setScreen('dashboard')}>provia</span>
+              <span style={{opacity:0.4, fontSize:12, cursor:'pointer'}} onClick={() => signOut(auth)}>Sign Out</span>
+            </nav>
           )}
-          {screen === 'skills' && (
-            <motion.div key="skills" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
-              <SkillSelect onSelect={(s) => { setSelectedSkill(s); setScreen('submit'); }} />
-            </motion.div>
+          {publicProfile ? ( <Dashboard user={publicProfile} proofs={proofs} readOnly={true} /> ) : (
+            <>
+              {screen === 'dashboard' && <Dashboard user={user} proofs={proofs} onAdd={() => setScreen('skills')} />}
+              {screen === 'skills' && <SkillSelect onSelect={(s) => { setSelectedSkill(s); setScreen('submit'); }} />}
+              {screen === 'submit' && <ProofSubmit skill={selectedSkill} onSubmit={(data) => {
+                 push(ref(db, `proofs/${user.uid}`), { ...data, timestamp: serverTimestamp() });
+                 setScreen('dashboard');
+              }} />}
+            </>
           )}
-          {screen === 'submit' && (
-            <motion.div key="submit" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
-              <ProofSubmit skill={selectedSkill} onSubmit={handleDeepAudit} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+        </>
+      )}
     </div>
   );
 }
-export default App;
