@@ -1,70 +1,59 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Send, Link, AlignLeft } from 'lucide-react';
 
 export default function ProofSubmit({ skill, onSubmit }) {
-  const [description, setDescription] = useState('');
-  const [link, setLink] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    onSubmit({
-      skill,
-      description,
-      link,
-      imageUrl: imageUrl || null
-    });
+    setLoading(true);
+    setError('');
+
+    const githubUrl = e.target.github.value;
+    
+    // Check if it's a real GitHub link
+    if (!githubUrl.includes("github.com")) {
+      setError("Please provide a valid GitHub link.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const repoPath = githubUrl.split("github.com/")[1];
+      const res = await fetch(`https://api.github.com/repos/${repoPath}`);
+      
+      if (res.ok) {
+        onSubmit({
+          skill,
+          description: e.target.desc.value,
+          github: githubUrl,
+          link: e.target.live.value,
+          verified: true
+        });
+      } else {
+        setError("Repository not found. Is it private?");
+        setLoading(false);
+      }
+    } catch (err) {
+      setError("Verification failed. Check your internet.");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="proof-submit-container">
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '28px', fontWeight: 900, margin: 0 }}>Archive {skill}</h2>
-      </div>
-
-      <form onSubmit={handleSubmit}>
+    <div className="submit-panel">
+      <h2 className="provia-title" style={{fontSize: 24}}>Verify {skill}</h2>
+      <form onSubmit={handleVerify}>
         <div className="input-container">
-          <div style={{ padding: '15px 20px 0', opacity: 0.3 }}>
-             <AlignLeft size={16} />
-          </div>
-          <textarea 
-            className="glass-input" 
-            placeholder="What did you build? (Short description)" 
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            style={{ minHeight: '120px', resize: 'none', paddingTop: '10px' }}
-          />
-          
-          <div style={{ padding: '15px 20px 0', opacity: 0.3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-             <Link size={16} />
-          </div>
-          <input 
-            className="glass-input" 
-            type="url" 
-            placeholder="Proof Link (GitHub/Drive/Live)" 
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            required
-          />
-
-          <input 
-            className="glass-input" 
-            type="url" 
-            placeholder="Image URL (Optional Preview)" 
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
+          <textarea name="desc" className="glass-input" placeholder="Technical breakdown of your project..." required style={{minHeight: '120px'}} />
+          <input name="github" className="glass-input" placeholder="GitHub Repository URL" required />
+          <input name="live" className="glass-input" placeholder="Live Demo URL" required />
         </div>
-
-        <button type="submit" className="action-btn">
-          <Send size={16} /> Confirm Verification
+        {error && <p style={{color: '#ff4444', fontSize: 12, textAlign: 'center', marginBottom: 15}}>{error}</p>}
+        <button className="action-btn" disabled={loading}>
+          {loading ? "VERIFYING..." : "VERIFY & SAVE"}
         </button>
       </form>
-
-      <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '12px', marginTop: '24px', fontWeight: 600 }}>
-        PROVIA SECURE LOGGING SYSTEM
-      </p>
     </div>
   );
 }
