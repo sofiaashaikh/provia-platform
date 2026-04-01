@@ -1,65 +1,46 @@
-import React, { useState } from 'react';
-import { User, Mail, Cpu, AlignLeft, Linkedin, Github, FileUp, CheckCircle, Loader2 } from 'lucide-react';
+import React from 'react';
+import { CheckCircle, X, Terminal, Link, AlignLeft } from 'lucide-react';
 
-export default function ProfileEdit({ user, onSave, onCancel }) {
-  const [resumeData, setResumeData] = useState(user.resumeLink || '');
-  const [name, setName] = useState(user.displayName || '');
-  const [email, setEmail] = useState(user.email || '');
-  const [skills, setSkills] = useState(user.skills || '');
-  const [bio, setBio] = useState(user.bio || '');
-  const [linkedin, setLinkedin] = useState(user.linkedin || '');
-  const [github, setGithub] = useState(user.github || '');
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 1048576) {
-      alert("File too large. Please use a PDF under 1MB.");
-      return;
-    }
-
-    setUploading(true);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setResumeData(reader.result);
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
+export default function ProofSubmit({ skill, onSubmit, onCancel }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({
+      skill: skill,
+      title: e.target.title.value,
+      description: e.target.description.value,
+      link: e.target.link.value,
+    });
   };
 
   return (
-    <div className="edit-panel">
-      <h2 className="provia-title" style={{fontSize: 24, marginBottom: 30}}>Identity Settings</h2>
-      
-      <div className="input-container">
-        <p style={{fontSize: 10, opacity: 0.4, padding: '15px 20px 0', fontWeight: 800}}>DISPLAY NAME</p>
-        <div style={{display: 'flex', alignItems: 'center', paddingRight: 15}}>
-          <input className="glass-input" value={name} onChange={(e) => setName(e.target.value)} style={{borderBottom: '1px solid rgba(255,255,255,0.05)'}} />
-          <User size={16} style={{opacity: 0.3}} />
-        </div>
-
-        <p style={{fontSize: 10, opacity: 0.4, padding: '15px 20px 0', fontWeight: 800}}>PROFESSIONAL BIO</p>
-        <textarea className="glass-input" value={bio} onChange={(e) => setBio(e.target.value)} style={{borderBottom: '1px solid rgba(255,255,255,0.05)', minHeight: '60px', resize: 'none'}} />
-
-        <p style={{fontSize: 10, opacity: 0.4, padding: '15px 20px 0', fontWeight: 800}}>RESUME (PDF)</p>
-        <label className="cute-upload-label" style={{margin: '10px 15px 20px'}}>
-          <input type="file" accept="application/pdf" onChange={handleFileUpload} hidden />
-          {uploading ? (
-            <div style={{display:'flex', gap:8, alignItems:'center'}}><Loader2 className="spinner" size={16}/> Processing...</div>
-          ) : resumeData ? (
-            <div style={{display:'flex', gap:8, alignItems:'center', color:'#fff'}}><CheckCircle size={16}/> Resume Ready</div>
-          ) : (
-            <div style={{display:'flex', gap:8, alignItems:'center', opacity:0.5}}><FileUp size={16}/> Tap to Upload PDF</div>
-          )}
-        </label>
+    <div className="container-elite" style={{paddingTop: '40px'}}>
+      <div style={{marginBottom: '50px'}}>
+        <span className="label-mini">NEW VERIFICATION</span>
+        <h1 className="title-main">Audit: <br/><span className="outline-text">{skill}</span></h1>
       </div>
 
-      <div style={{marginTop: 40}}>
-        <button className="action-btn" onClick={() => onSave({ ...user, displayName: name, resumeLink: resumeData, email, skills, bio, linkedin, github })}>
-          SAVE PROFILE
-        </button>
-        <p onClick={onCancel} className="auth-toggle">CANCEL</p>
+      <div className="glass-card">
+        <form onSubmit={handleSubmit}>
+          <div style={{marginBottom: '30px'}}>
+            <label className="label-mini"><Terminal size={12}/> PROJECT TITLE</label>
+            <input className="apple-input" name="title" placeholder="e.g., Network Intrusion Detection AI" required />
+          </div>
+
+          <div style={{marginBottom: '30px'}}>
+            <label className="label-mini"><Link size={12}/> REPOSITORY URL</label>
+            <input className="apple-input" name="link" placeholder="https://github.com/username/project" required />
+          </div>
+
+          <div style={{marginBottom: '40px'}}>
+            <label className="label-mini"><AlignLeft size={12}/> TECHNICAL DESCRIPTION</label>
+            <textarea className="apple-input" name="description" placeholder="Detail the architectural logic and stack used..." rows="5" style={{height:'auto'}} required />
+          </div>
+
+          <div style={{display: 'flex', gap: '15px'}}>
+            <button type="submit" className="btn-elite" style={{flex: 2, display: 'flex', alignItems:'center', justifyContent:'center', gap:10}}><CheckCircle size={18}/> Initiate Audit</button>
+            <button type="button" onClick={onCancel} className="btn-elite" style={{flex: 1, background: 'transparent', color: 'white', border: '1px solid var(--border)'}}><X size={18}/></button>
+          </div>
+        </form>
       </div>
     </div>
   );
